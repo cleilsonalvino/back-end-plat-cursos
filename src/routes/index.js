@@ -10,7 +10,7 @@ r.get('/health', (_req, res) =>
 
 // Rotas oficiais
 r.use('/auth', authRoutes);
-r.use('/courses', courseRoutes);
+r.use('/cursos', courseRoutes);
 
 
 

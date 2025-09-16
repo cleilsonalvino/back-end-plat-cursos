@@ -29,17 +29,37 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    res.json(await service.login(email, password));
-    
+    const result = await service.login(email, password);
+    return res.status(200).json(result);
   } catch (e) {
-    next(e);
+    console.error(e);
+
+    // Se o erro já vem com status e código
+    if (e.status) {
+      return res.status(e.status).json({
+        status: e.status,
+        code: e.code || 'ERROR',
+        message: e.message || 'Erro desconhecido',
+        details: e.details || [],
+      });
+    }
+
+    // Caso contrário, erro genérico
+    return res.status(500).json({
+      status: 500,
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Erro interno no servidor',
+    });
   }
 };
+
+
 export const refresh = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
     res.json(await service.refresh(refreshToken));
   } catch (e) {
+    
     next(e);
   }
 };

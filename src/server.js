@@ -16,6 +16,7 @@ app.use((req, res) => {
 });
 
 logInfo('Servidor iniciado na porta 3000');
+logInfo(`AJAFS API DOCS rodando em http://localhost:${port}/v1/docs`);
 
 
 app.listen(port, () => console.log(`AJAFS API rodando em http://localhost:${port}`));
