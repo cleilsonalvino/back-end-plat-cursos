@@ -27,7 +27,8 @@ export const createModule = async (req: Request, res: Response, next: NextFuncti
 export const listModulesByCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { courseId } = req.params;
-    const modules = await service.listByCourse(courseId);
+    const userId = req.user!.sub;
+    const modules = await service.listByCourseWithProgress(courseId, userId);
     res.json(modules);
   } catch (e) {
     next(e);

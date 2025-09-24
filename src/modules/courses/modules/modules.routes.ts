@@ -6,10 +6,12 @@ import { createModule, listModulesByCourse, moduleSchema } from './modules.contr
 
 const r = Router();
 
+
+
 // Criar módulo (apenas instrutores/admin)
 r.post('/create', auth, requireRole('INSTRUCTOR', 'ADMIN'), validate(moduleSchema), createModule);
 
 // Listar módulos de um curso
-r.get('/curso/:courseId', listModulesByCourse);
+r.get('/course/:courseId', auth,  listModulesByCourse);
 
 export default r;

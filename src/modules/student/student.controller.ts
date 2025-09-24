@@ -15,6 +15,7 @@ export const enroll = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 export const getEnrollments = async (req: Request, res: Response, next: NextFunction) => {
+    console.log('foi essa')
     try {
         const studentId = req.user!.sub;
         const enrollments = await studentService.getEnrollments(studentId);
@@ -55,3 +56,24 @@ export const getCertificates = async (req: Request, res: Response, next: NextFun
         next(error);
     }
 };
+
+export const getStudentCoursesWithProgress = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const studentId = req.user!.sub;
+        const coursesWithProgress = await studentService.getStudentCoursesWithProgress(studentId);
+        res.json(coursesWithProgress);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getCourseModules = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const studentId = req.user!.sub;
+        const { slug } = req.params;
+        const modules = await studentService.getCourseModules(studentId, slug);
+        res.json(modules);
+    } catch (error) {
+        next(error);
+    }
+};  

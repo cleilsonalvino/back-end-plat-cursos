@@ -44,7 +44,7 @@ const router = Router();
 router.post(
   '/',
   auth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'INSTRUCTOR'),
   enrollmentController.createEnrollmentHandler
 );
 

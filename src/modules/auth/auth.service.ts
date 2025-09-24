@@ -23,30 +23,45 @@ export class AuthService {
     });
     return this.issue(user.id, user.role);
   }
-  async login(email: string, password: string) {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user)
-      throw {
-        status: 401,
-        code: "BAD_CREDENTIALS",
-        message: "Credenciais inválidas",
-      };
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok)
-      throw {
-        status: 401,
-        code: "BAD_CREDENTIALS",
-        message: "Credenciais inválidas",
-      };
-    logSuccess("Usuário logado com sucesso");
-    return this.issue(user.id, user.role);
-  }
-  issue(sub: string, role: string) {
-    return {
-      accessToken: signAccess({ sub, role }),
-      refreshToken: signRefresh({ sub, role }),
+async login(email: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user)
+    throw {
+      status: 401,
+      code: "BAD_CREDENTIALS",
+      message: "Credenciais inválidas",
     };
-  }
+
+  const ok = await bcrypt.compare(password, user.passwordHash);
+  if (!ok)
+    throw {
+      status: 401,
+      code: "BAD_CREDENTIALS",
+      message: "Credenciais inválidas",
+    };
+
+  logSuccess("Usuário logado com sucesso");
+
+  const tokens = this.issue(user.id, user.role);
+
+  return {
+    ...tokens,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  };
+}
+
+issue(sub: string, role: string) {
+  return {
+    accessToken: signAccess({ sub, role }),
+    refreshToken: signRefresh({ sub, role }),
+  };
+}
+
   async refresh(token: string) {
     const payload = verifyRefresh(token) as RefreshTokenPayload;
     return this.issue(payload.sub, payload.role);

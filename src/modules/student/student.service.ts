@@ -124,4 +124,83 @@ export class StudentService {
 
     return certificates;
   }
+
+  async getStudentCoursesWithProgress(studentId: string) {
+    const enrollments = await prisma.enrollment.findMany({
+      where: {
+        userId: studentId,
+      },
+      include: {
+        course: {
+          include: {
+            lessons: true,
+
+          },
+        },
+        
+      },
+    });
+
+    const coursesWithProgress = await Promise.all(
+      enrollments.map(async (enrollment) => {
+        const course = enrollment.course;
+        const totalLessons = course.lessons.length;
+
+        if (totalLessons === 0) {
+          return {
+            ...course,
+            enrollmentId: enrollment.id,
+            completedLessons: 0,
+            totalLessons: 0,
+            progress: 0,
+            isEnrolled: true,
+          };
+        }
+
+        const completedLessons = await prisma.progress.count({
+          where: {
+            userId: studentId,
+            lessonId: {
+              in: course.lessons.map((lesson) => lesson.id),
+            },
+            completed: true,
+          },
+        });
+
+        const progress = (completedLessons / totalLessons) * 100;
+
+        return {
+          ...course,
+          enrollmentId: enrollment.id,
+          completedLessons,
+          totalLessons,
+          progress: parseFloat(progress.toFixed(2)),
+          isEnrolled: true,
+        };
+      })
+    );
+
+    return coursesWithProgress;
+  }
+
+  async getCourseModules(studentId: string, slug: string) {
+    const enrollment = await prisma.enrollment.findFirst({
+      where: {
+        userId: studentId,
+        course: {
+          slug: slug,
+        },
+      },
+      include: {
+        course: {
+          include: {
+            modules: true,
+            lessons: true,
+          },
+        },
+      },
+      },
+    )
+    return enrollment;
+  }
 }

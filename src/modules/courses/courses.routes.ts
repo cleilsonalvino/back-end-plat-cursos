@@ -67,7 +67,6 @@ r.get('/', validate(qSchema), list);
  */
 r.get('/:slug', bySlug);
 
-
 /**
  * @swagger
  * /cursos:
@@ -101,5 +100,6 @@ r.get('/:slug', bySlug);
  *         description: Proibido
  */
 r.post('/create', auth, requireRole('INSTRUCTOR', 'ADMIN'), validate(createSchema), create);
+
 
 export default r;
